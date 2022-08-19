@@ -1,7 +1,11 @@
 import React, {useState} from "react"
-
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../database/firebase'
+import { db } from '../database/firebase'
+import { doc, setDoc } from "firebase/firestore";
 import { View, Text, Button, TextInput, ScrollView, StyleSheet } from "react-native"
-
+//import { initializeApp } from "firebase/app";
+//import { firebaseConfig } from "../firebase"
 function CreateUserScreen() {
     const [state, setState] = useState({
         name: '',
@@ -13,8 +17,13 @@ function CreateUserScreen() {
         setState({ ...state, [name]: value })
       }
 
-      const saveNewUser = () => {
+    const saveNewUser = async() => {
         console.log(state)
+        await setDoc(doc(db, "cities", "LA"), {
+            name: "Los Angeles",
+            state: "CA",
+            country: "USA"
+          });
       }
   return (
     <ScrollView style={styles.container}>
