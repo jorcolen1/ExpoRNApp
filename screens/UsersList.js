@@ -1,6 +1,6 @@
-import React from 'react'
-import {View, Text} from 'react-native'
-
+import React, { useState, useEffect } from "react"
+import {View, Text, Button, StyleSheet} from 'react-native'
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 function UsersList() {
   return (
     <View>

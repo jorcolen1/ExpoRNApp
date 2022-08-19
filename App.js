@@ -2,8 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { db } from './database/firebase'
-import { doc, setDoc } from "firebase/firestore";
+
 
 import { View, Text, Button, TextInput, ScrollView } from "react-native"
 
@@ -49,13 +48,9 @@ const create = () => {
 export default function App() {
   console.log('hola todo el mundooo ',)
   return (
-
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <Button title='crear' onPress={create}></Button>
-      <StatusBar style="auto" />
-    </View>
-
+    <NavigationContainer>
+      <MyStack/>
+    </NavigationContainer>
   );
 }
 

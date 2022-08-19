@@ -1,16 +1,16 @@
-import React, {useState} from "react"
+import React, { useState } from "react"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../database/firebase'
 import { db } from '../database/firebase'
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import { View, Text, Button, TextInput, ScrollView, StyleSheet } from "react-native"
-//import { initializeApp } from "firebase/app";
-//import { firebaseConfig } from "../firebase"
-function CreateUserScreen() {
+
+const CreateUserScreen = (props) => {
     const [state, setState] = useState({
         name: '',
+        phone: '',     
         email: '',
-        phone: ''     
+        password: ''
     })
     const handleChange = ( name, value) => {
         //console.log(name, value)
@@ -19,11 +19,25 @@ function CreateUserScreen() {
 
     const saveNewUser = async() => {
         console.log(state)
-        await setDoc(doc(db, "cities", "LA"), {
-            name: "Los Angeles",
-            state: "CA",
-            country: "USA"
-          });
+        if (state.name === ''){
+            alert('ingrese el nombre')
+        }else
+        {
+            try {
+                const docRef = await addDoc(collection(db, "Users"), {
+                    name: state.name,
+                    phone: state.phone,
+                    email: state.email,
+                    password: state.password
+                  });
+                  console.log("Document written with ID: ", docRef.id);
+                  alert('Guardado')
+                  props.navigation.navigate('UserList')
+            } catch (error) {
+                
+            }
+        }
+        
       }
   return (
     <ScrollView style={styles.container}>
@@ -35,14 +49,20 @@ function CreateUserScreen() {
         </View>
         <View style={styles.inputGroup}>
             <TextInput 
+                placeholder="Phone de user"
+                onChangeText={(value) => handleChange('phone', value)}
+            />
+        </View>
+        <View style={styles.inputGroup}>
+            <TextInput 
                 placeholder="Email de user"
                 onChangeText={(value) => handleChange('email', value)}            
             />
         </View>
         <View style={styles.inputGroup}>
             <TextInput 
-                placeholder="Phone de user"
-                onChangeText={(value) => handleChange('phone', value)}
+                placeholder="Password de user"
+                onChangeText={(value) => handleChange('password', value)}            
             />
         </View>
         <View>
