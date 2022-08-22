@@ -2,9 +2,19 @@ import React, { useEffect, useState } from "react"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../database/firebase'
 import { db } from '../database/firebase'
-import { doc, setDoc, collection, addDoc } from "firebase/firestore";
+import {
+    collection,
+    doc,
+    getDoc,
+    getDocs,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+  } from 'firebase/firestore'
 import { View, Text, Button, TextInput, ScrollView, StyleSheet } from "react-native"
-import { BarCodeScanner } from "expo-barcode-scanner";
+import ModalDropdown from 'react-native-modal-dropdown';
+import {Picker} from '@react-native-picker/picker';
 
 const CreateUserScreen = (props) => {
     const [state, setState] = useState({
@@ -13,35 +23,52 @@ const CreateUserScreen = (props) => {
         email: '',
         password: ''
     })
-
-    const [hasPermissions, setHasPermissions] = useState(null)
-    const [scanned, setScanned] = useState(false)
+    const intialValues = {
+        name: '',
+        location: '',
+        eventoName: '',
+      }
+    
+      const [values, setValues] = useState(intialValues)
+      const [eventId, setEventId] = useState('')
+      const [listaEventos, setListaEventos] = useState([])
+      const [selectedLanguage, setSelectedLanguage] = useState('Evento');
+      useEffect(() => {
+        const traerEventos = async () => {
+          let eventosArr = []
+          const EventosPartOne = query(
+            collection(db, 'Eventos'),
+            //where('state', '==', "Activo"),
+            orderBy('name', 'asc'),
+          )
+          const snapshot = await getDocs(EventosPartOne)
+          snapshot.forEach((doc) => {
+            const task = doc.data()
+            task.id = doc.id
+            eventosArr.push(task)
+          })
+          /* const unsub = onSnapshot(doc(db, 'UsersAll', uidCurrent), (doc) => {
+            eventosArr = eventosArr.concat(doc.data().permEventos)
+            //setListaRecintos(doc.data().permRecintos)
+            console.log('Complete: ', eventosArr)
+            setListaEventos(eventosArr.sort((a, b) => a.name > b.name))
+          }) */
+          console.log('Complete: ', eventosArr)
+          setListaEventos(eventosArr.sort((a, b) => a.name > b.name))
+        }
+        traerEventos()
+      }, [])
+   
     const handleChange = ( name, value) => {
         //console.log(name, value)
         setState({ ...state, [name]: value })
       }
 
     useEffect(() => {
-        const getBarCodeScannerPermissions = async () => {
-            const { status } = await BarCodeScanner.requestPermissionsAsync()
-            setHasPermissions(status === 'granted')
-        }
-
-        getBarCodeScannerPermissions()
+        
     }, [])
 
-    const handleBarCodeScanned = ({type, data}) => {
-        setScanned(true)
-        alert(`Bar code with type ${type} and data ${data} has been scanned`)
-    }
-
-    if (hasPermissions === null) {
-        return <Text>Requesting for camera permissions</Text>
-    } 
-
-    if (hasPermissions === false) {
-        return <Text>No access to camera</Text>
-    }
+   
     const saveNewUser = async() => {
         console.log(state)
         if (state.name === ''){
@@ -57,7 +84,7 @@ const CreateUserScreen = (props) => {
                   });
                   console.log("Document written with ID: ", docRef.id);
                   alert('Guardado')
-                  props.navigation.navigate('UserList')
+                  //props.navigation.navigate('IniciarSesión')
             } catch (error) {
                 
             }
@@ -99,16 +126,39 @@ const CreateUserScreen = (props) => {
                 onChangeText={(value) => handleChange('password', value)}            
             />
         </View>
-        <View>
+        <View style={styles.inputGroup}>
+            <Text style={[styles.title]}>Evento:</Text>
+            <ModalDropdown options={['option 1', 'option 2']}/>
+            <ModalDropdown 
+            value={values.eventoName}
+            options={listaEventos.map((evento) => (
+                `${evento.name}`,
+                console.log('adatos',evento.name)
+            ))}/>
+        </View>
+        <View style={styles.inputGroup}>
+            <Picker
+            selectedValue={state.eventoName}
+            onValueChange={(value) => handleChange('eventoName', value)}>
+            <Picker.Item  label={"----"} value={""} />
+            {listaEventos.map((evento) => (
+                <Picker.Item  key={evento.id} label={evento.name} value={evento.id} />
+              ))}
+            </Picker>
+        </View>
+        
+
+        
+       {/*  <View>
             <Button 
                 title="Guardar user" 
                 onPress= {() => saveNewUser() }/>
         </View>
         <View>
-            <Button 
+            <Button
                 title="leer QR" 
                 onPress= {() => LecturaQR() }/>
-        </View>
+        </View> */}
     </ScrollView>
   )
 }
@@ -125,12 +175,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor:"#cccccc",
     },
-    container1: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-      },
-
 })
 
 export default CreateUserScreen

@@ -7,17 +7,17 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, Button, TextInput, ScrollView } from "react-native"
 
 const Stack = createNativeStackNavigator();
-import UsersList from './screens/UsersList';
-import CreateUserScreen from './screens/CreateUserScreen';
+import Login from './screens/Login';
+import Home from './screens/Home';
 import UserDetailScreen from './screens/UserDetailScreen';
 import ReadQr from './screens/ReadQr';
 
 function MyStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name='CreateUserScreen' component={CreateUserScreen}/>
+      <Stack.Screen name='Home' component={Home}/>
+      <Stack.Screen name='IniciarSesión' component={Login}/>
       <Stack.Screen name='ReadQr' component={ReadQr}/>
-      <Stack.Screen name='UserList' component={UsersList}/>
       <Stack.Screen name='UserDetailScreen' component={UserDetailScreen}/>
     </Stack.Navigator>
   )
@@ -59,7 +59,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '',
     alignItems: 'center',
     justifyContent: 'center',
   },
