@@ -1,9 +1,10 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../database/firebase'
 import { db } from '../database/firebase'
 import { doc, setDoc, collection, addDoc } from "firebase/firestore";
 import { View, Text, Button, TextInput, ScrollView, StyleSheet } from "react-native"
+import { BarCodeScanner } from "expo-barcode-scanner";
 
 const CreateUserScreen = (props) => {
     const [state, setState] = useState({
@@ -12,11 +13,35 @@ const CreateUserScreen = (props) => {
         email: '',
         password: ''
     })
+
+    const [hasPermissions, setHasPermissions] = useState(null)
+    const [scanned, setScanned] = useState(false)
     const handleChange = ( name, value) => {
         //console.log(name, value)
         setState({ ...state, [name]: value })
       }
 
+    useEffect(() => {
+        const getBarCodeScannerPermissions = async () => {
+            const { status } = await BarCodeScanner.requestPermissionsAsync()
+            setHasPermissions(status === 'granted')
+        }
+
+        getBarCodeScannerPermissions()
+    }, [])
+
+    const handleBarCodeScanned = ({type, data}) => {
+        setScanned(true)
+        alert(`Bar code with type ${type} and data ${data} has been scanned`)
+    }
+
+    if (hasPermissions === null) {
+        return <Text>Requesting for camera permissions</Text>
+    } 
+
+    if (hasPermissions === false) {
+        return <Text>No access to camera</Text>
+    }
     const saveNewUser = async() => {
         console.log(state)
         if (state.name === ''){
@@ -69,6 +94,13 @@ const CreateUserScreen = (props) => {
             <Button 
                 title="Guardar user" 
                 onPress= {() => saveNewUser() }/>
+        </View>
+        <View>
+            <BarCodeScanner 
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+              style={StyleSheet.absoluteFillObject}
+            />
+            {scanned && <Button tittle={'Tap to scan again'} onPress={() => setScanned(false)} />}
         </View>
     </ScrollView>
   )
