@@ -10,11 +10,13 @@ const Stack = createNativeStackNavigator();
 import UsersList from './screens/UsersList';
 import CreateUserScreen from './screens/CreateUserScreen';
 import UserDetailScreen from './screens/UserDetailScreen';
+import ReadQr from './screens/ReadQr';
 
 function MyStack() {
   return (
     <Stack.Navigator>
       <Stack.Screen name='CreateUserScreen' component={CreateUserScreen}/>
+      <Stack.Screen name='ReadQr' component={ReadQr}/>
       <Stack.Screen name='UserList' component={UsersList}/>
       <Stack.Screen name='UserDetailScreen' component={UserDetailScreen}/>
     </Stack.Navigator>

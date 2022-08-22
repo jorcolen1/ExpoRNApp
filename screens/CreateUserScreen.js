@@ -64,6 +64,15 @@ const CreateUserScreen = (props) => {
         }
         
       }
+    const LecturaQR = async() => {
+
+        try {
+                props.navigation.navigate('ReadQr')
+        } catch (error) {
+            
+        }
+        
+      }
   return (
     <ScrollView style={styles.container}>
         <View style={styles.inputGroup}>
@@ -96,11 +105,9 @@ const CreateUserScreen = (props) => {
                 onPress= {() => saveNewUser() }/>
         </View>
         <View>
-            <BarCodeScanner 
-              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-              style={StyleSheet.absoluteFillObject}
-            />
-            {scanned && <Button tittle={'Tap to scan again'} onPress={() => setScanned(false)} />}
+            <Button 
+                title="leer QR" 
+                onPress= {() => LecturaQR() }/>
         </View>
     </ScrollView>
   )
@@ -118,6 +125,11 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor:"#cccccc",
     },
+    container1: {
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'center',
+      },
 
 })
 
