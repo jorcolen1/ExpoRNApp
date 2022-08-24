@@ -17,20 +17,16 @@ import {AppStyles} from '../AppStyles'
 
 
 const CreateUserScreen = (props) => {
-    const [state, setState] = useState({
-        name: '',
-        phone: '',     
-        email: '',
-        password: ''
-    })
+
     const intialValues = {
         name: '',
-        location: '',
-        eventoName: '',
+        recintoName: '',
+        unixDateStart: '',
+        hourStart: '',
       }
     
-      const [listaEventos, setListaEventos] = useState([])
       const [values, setValues] = useState(intialValues)
+      const [listaEventos, setListaEventos] = useState([])
       const [eventId, setEventId] = useState('')
       useEffect(() => {
         const traerEventos = async () => {
@@ -59,10 +55,37 @@ const CreateUserScreen = (props) => {
         }
         traerEventos()
       }, [])
-   
+      useEffect(() => {
+        async function getInfo(eventId) {
+          let transactArrBase = []
+          let transactData = []
+          const eventoQuery = await getDoc(doc(db, 'Eventos', eventId))
+          const eventValues = eventoQuery.data()
+          console.log('values Data-->>', eventValues)
+          eventValues.id=eventId
+          console.log('values 22222222-->>', eventValues)
+
+          /* const RefDB = query(
+            collection(db, 'Eventos', eventoQuery.id, 'Entradas'),
+            orderBy('seatInfo', 'asc'),
+          )
+          const planoZonas = await getDocs(RefDB)
+          planoZonas.forEach((doc) => transactArrBase.push(doc.data()))
+          transactArrBase.forEach((doc) => {
+
+          }) */
+          
+    
+          //setListaClientes(transactData)
+          setValues(eventValues)
+          setEventId(eventoQuery.id)
+        }
+        if (values.eventoName) getInfo(values.eventoName)
+      }, [values])
+    
     const handleChange = ( name, value) => {
         //console.log(name, value)
-        setState({ ...state, [name]: value })
+        setValues({ ...values, [name]: value })
       }
    
     const saveNewUser = async() => {
@@ -96,6 +119,15 @@ const CreateUserScreen = (props) => {
         }
         
       }
+  const parseDate = (unixDate) => {
+    if (unixDate === undefined || isNaN(unixDate)) {
+      return ''
+    } else {
+      const newDate = new Date(unixDate * 1000).toISOString()
+      //return newDate.split('T')[0]
+      return newDate.split('T')[0]
+    }
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Gestor de ticket :</Text>
@@ -103,7 +135,7 @@ const CreateUserScreen = (props) => {
           <Text style={styles.leftTitle}>Evento:</Text>
             <Picker
             style={styles.leftTitle}
-            selectedValue={state.eventoName}
+            selectedValue={values.id}
             onValueChange={(value) => handleChange('eventoName', value)}>
             <Picker.Item  label={"----"} value={""} />
             {listaEventos.map((evento) => (
@@ -115,9 +147,10 @@ const CreateUserScreen = (props) => {
             <TextInput
                 style={styles.body}
                 placeholder="Recinto"
-                value={state.password}
+                value={values.recintoName}
                 placeholderTextColor={AppStyles.color.grey}
-                underlineColorAndroid="transparent" 
+                underlineColorAndroid="transparent"
+                editable={false} 
                 //onChangeText={(value) => handleChange('name', value)}
             />
         </View>
@@ -125,9 +158,10 @@ const CreateUserScreen = (props) => {
             <TextInput 
                 style={styles.body}
                 placeholder="Fecha"
-                value={state.password}
+                value={parseDate(values.unixDateStart)}
                 placeholderTextColor={AppStyles.color.grey}
                 underlineColorAndroid="transparent"
+                editable={false}
                 //onChangeText={(value) => handleChange('phone', value)}
             />
         </View>
@@ -135,9 +169,10 @@ const CreateUserScreen = (props) => {
             <TextInput 
                 style={styles.body}
                 placeholder="Hora"
-                value={state.password}
+                value={values.hourStart}
                 placeholderTextColor={AppStyles.color.grey}
                 underlineColorAndroid="transparent"
+                editable={false}
                 //onChangeText={(value) => handleChange('email', value)}            
             />
         </View>

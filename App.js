@@ -15,8 +15,8 @@ import ReadQr from './screens/ReadQr';
 function MyStack() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name='IniciarSesión' component={Login}/>
       <Stack.Screen name='Home' component={Home}/>
+      <Stack.Screen name='IniciarSesión' component={Login}/>
       <Stack.Screen name='ReadQr' component={ReadQr}/>
       <Stack.Screen name='UserDetailScreen' component={UserDetailScreen}/>
     </Stack.Navigator>
