@@ -23,12 +23,8 @@ const CreateUserScreen = (props) => {
         recintoName: '',
         unixDateStart: '',
         hourStart: '',
-      }
-     const intialState = {
-        name: '',
-        recintoName: '',
-        unixDateStart: '',
         hourStart: '',
+        estTotal: 0,
       }
     
       const [values, setValues] = useState(intialValues)
@@ -80,7 +76,7 @@ const CreateUserScreen = (props) => {
           
           console.log('values Entradas-->>', transactArrBase)
           
-          let Stadistic =[0, 0, 0, 0, 0, transactArrBase.length]
+          let Stadistic =[0, 0, 0, 0, 0 ]
           transactArrBase.forEach((doc) => {
             switch (doc.estado) {
               case 'Libre':
@@ -103,8 +99,15 @@ const CreateUserScreen = (props) => {
             }
           })
           console.log('estadisticas',Stadistic)
-    
+          eventValues.estTotal=transactArrBase.length
+          eventValues.estLibre= Stadistic[0]
+          eventValues.estReservado=Stadistic[1]
+          eventValues.estPendiente=Stadistic[2]
+          eventValues.estVendido=Stadistic[3]
+          eventValues.estValidado=Stadistic[4]
           //setListaClientes(transactData)
+          console.log('values estadisticasNames-->>', eventValues)
+
           setValues(eventValues)
           setStadistic(Stadistic)
           setEventId(eventoQuery.id)
@@ -199,6 +202,17 @@ const CreateUserScreen = (props) => {
                 style={styles.body}
                 placeholder="Hora"
                 value={values.hourStart}
+                placeholderTextColor={AppStyles.color.grey}
+                underlineColorAndroid="transparent"
+                editable={false}
+                //onChangeText={(value) => handleChange('email', value)}            
+            />
+        </View>
+        <View style={styles.InputContainer}>
+            <TextInput 
+                style={styles.body}
+                placeholder=""
+                value={`${values.estTotal},${values.estLibre},${values.estReservado},${values.estPendiente},${values.estVendido},${values.estValidado}`}
                 placeholderTextColor={AppStyles.color.grey}
                 underlineColorAndroid="transparent"
                 editable={false}
