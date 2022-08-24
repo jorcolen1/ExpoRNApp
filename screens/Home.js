@@ -219,7 +219,12 @@ const CreateUserScreen = (props) => {
                 //onChangeText={(value) => handleChange('email', value)}            
             />
         </View>
-
+        <View style={styles.loginContainer}>
+            <Button
+                title="leer QR"
+                style={styles.loginText} 
+                onPress= {() => LecturaQR() }/>
+        </View>
         
         
 
