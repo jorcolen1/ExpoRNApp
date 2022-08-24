@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
-import { auth } from '../database/firebase'
 import { db } from '../database/firebase'
 import {
     collection,
@@ -15,6 +13,8 @@ import {
 import { View, Text, Button, TextInput, ScrollView, StyleSheet } from "react-native"
 import ModalDropdown from 'react-native-modal-dropdown';
 import {Picker} from '@react-native-picker/picker';
+import {AppStyles} from '../AppStyles'
+
 
 const CreateUserScreen = (props) => {
     const [state, setState] = useState({
@@ -29,10 +29,9 @@ const CreateUserScreen = (props) => {
         eventoName: '',
       }
     
+      const [listaEventos, setListaEventos] = useState([])
       const [values, setValues] = useState(intialValues)
       const [eventId, setEventId] = useState('')
-      const [listaEventos, setListaEventos] = useState([])
-      const [selectedLanguage, setSelectedLanguage] = useState('Evento');
       useEffect(() => {
         const traerEventos = async () => {
           let eventosArr = []
@@ -46,6 +45,8 @@ const CreateUserScreen = (props) => {
             const task = doc.data()
             task.id = doc.id
             eventosArr.push(task)
+          console.log('dataa: ', doc.data())
+
           })
           /* const unsub = onSnapshot(doc(db, 'UsersAll', uidCurrent), (doc) => {
             eventosArr = eventosArr.concat(doc.data().permEventos)
@@ -63,11 +64,6 @@ const CreateUserScreen = (props) => {
         //console.log(name, value)
         setState({ ...state, [name]: value })
       }
-
-    useEffect(() => {
-        
-    }, [])
-
    
     const saveNewUser = async() => {
         console.log(state)
@@ -101,43 +97,12 @@ const CreateUserScreen = (props) => {
         
       }
   return (
-    <ScrollView style={styles.container}>
-        <View style={styles.inputGroup}>
-            <TextInput 
-                placeholder="Nombre de user" 
-                onChangeText={(value) => handleChange('name', value)}
-            />
-        </View>
-        <View style={styles.inputGroup}>
-            <TextInput 
-                placeholder="Phone de user"
-                onChangeText={(value) => handleChange('phone', value)}
-            />
-        </View>
-        <View style={styles.inputGroup}>
-            <TextInput 
-                placeholder="Email de user"
-                onChangeText={(value) => handleChange('email', value)}            
-            />
-        </View>
-        <View style={styles.inputGroup}>
-            <TextInput 
-                placeholder="Password de user"
-                onChangeText={(value) => handleChange('password', value)}            
-            />
-        </View>
-        <View style={styles.inputGroup}>
-            <Text style={[styles.title]}>Evento:</Text>
-            <ModalDropdown options={['option 1', 'option 2']}/>
-            <ModalDropdown 
-            value={values.eventoName}
-            options={listaEventos.map((evento) => (
-                `${evento.name}`,
-                console.log('adatos',evento.name)
-            ))}/>
-        </View>
-        <View style={styles.inputGroup}>
+    <View style={styles.container}>
+      <Text style={styles.title}>Gestor de ticket :</Text>
+        <View style={styles.InputContainer}>
+          <Text style={styles.leftTitle}>Evento:</Text>
             <Picker
+            style={styles.leftTitle}
             selectedValue={state.eventoName}
             onValueChange={(value) => handleChange('eventoName', value)}>
             <Picker.Item  label={"----"} value={""} />
@@ -146,6 +111,38 @@ const CreateUserScreen = (props) => {
               ))}
             </Picker>
         </View>
+        <View style={styles.InputContainer}>
+            <TextInput
+                style={styles.body}
+                placeholder="Recinto"
+                value={state.password}
+                placeholderTextColor={AppStyles.color.grey}
+                underlineColorAndroid="transparent" 
+                //onChangeText={(value) => handleChange('name', value)}
+            />
+        </View>
+        <View style={styles.InputContainer}>
+            <TextInput 
+                style={styles.body}
+                placeholder="Fecha"
+                value={state.password}
+                placeholderTextColor={AppStyles.color.grey}
+                underlineColorAndroid="transparent"
+                //onChangeText={(value) => handleChange('phone', value)}
+            />
+        </View>
+        <View style={styles.InputContainer}>
+            <TextInput 
+                style={styles.body}
+                placeholder="Hora"
+                value={state.password}
+                placeholderTextColor={AppStyles.color.grey}
+                underlineColorAndroid="transparent"
+                //onChangeText={(value) => handleChange('email', value)}            
+            />
+        </View>
+
+        
         
 
         
@@ -159,22 +156,67 @@ const CreateUserScreen = (props) => {
                 title="leer QR" 
                 onPress= {() => LecturaQR() }/>
         </View> */}
-    </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-    container :{
-        flex :1,
-        padding:35,
-    },
-    inputGroup:{
-        flex:1,
-        padding: 0,
-        marginBottom: 15,
-        borderBottomWidth: 1,
-        borderBottomColor:"#cccccc",
-    },
-})
+  container: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  or: {
+    color: 'black',
+    marginTop: 40,
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: AppStyles.fontSize.title,
+    fontWeight: 'bold',
+    color: AppStyles.color.blue,
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  leftTitle: {
+    alignSelf: 'stretch',
+    textAlign: 'left',
+    marginLeft: 20,
+  },
+  content: {
+    paddingLeft: 50,
+    paddingRight: 50,
+    textAlign: 'center',
+    fontSize: AppStyles.fontSize.content,
+    color: AppStyles.color.text,
+  },
+  loginContainer: {
+    width: AppStyles.buttonWidth.main,
+    backgroundColor: AppStyles.color.blank,
+    borderRadius: AppStyles.borderRadius.main,
+    padding: 10,
+    marginTop: 30,
+  },
+  loginText: {
+    color: AppStyles.color.tint,
+  
+  },
+  placeholder: {
+    color: 'red',
+  },
+  InputContainer: {
+    width: AppStyles.textInputWidth.main,
+    marginTop: 30,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: AppStyles.color.grey,
+    borderRadius: AppStyles.borderRadius.main,
+  },
+  body: {
+    height: 40,
+    paddingLeft: 20,
+    paddingRight: 20,
+    color: AppStyles.color.text,
+  }
+});
 
 export default CreateUserScreen
