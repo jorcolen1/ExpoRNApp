@@ -24,9 +24,17 @@ const CreateUserScreen = (props) => {
         unixDateStart: '',
         hourStart: '',
       }
+     const intialState = {
+        name: '',
+        recintoName: '',
+        unixDateStart: '',
+        hourStart: '',
+      }
     
       const [values, setValues] = useState(intialValues)
       const [listaEventos, setListaEventos] = useState([])
+      const [stadistic, setStadistic] = useState([])
+
       const [eventId, setEventId] = useState('')
       useEffect(() => {
         const traerEventos = async () => {
@@ -61,23 +69,44 @@ const CreateUserScreen = (props) => {
           let transactData = []
           const eventoQuery = await getDoc(doc(db, 'Eventos', eventId))
           const eventValues = eventoQuery.data()
-          console.log('values Data-->>', eventValues)
           eventValues.id=eventId
-          console.log('values 22222222-->>', eventValues)
 
-          /* const RefDB = query(
+          const RefDB = query(
             collection(db, 'Eventos', eventoQuery.id, 'Entradas'),
             orderBy('seatInfo', 'asc'),
           )
-          const planoZonas = await getDocs(RefDB)
-          planoZonas.forEach((doc) => transactArrBase.push(doc.data()))
-          transactArrBase.forEach((doc) => {
-
-          }) */
+          const Entradas = await getDocs(RefDB)
+          Entradas.forEach((doc) => transactArrBase.push(doc.data()))
           
+          console.log('values Entradas-->>', transactArrBase)
+          
+          let Stadistic =[0, 0, 0, 0, 0, transactArrBase.length]
+          transactArrBase.forEach((doc) => {
+            switch (doc.estado) {
+              case 'Libre':
+                Stadistic[0]++
+                break;
+              case 'Reservado':
+                Stadistic[1]++
+                break;
+              case 'Pendiente':
+                Stadistic[2]++
+                break;
+              case 'Vendido':
+                Stadistic[3]++
+                break;
+              case 'Validado':
+                Stadistic[4]++
+                break;
+              default:
+                console.log('default');
+            }
+          })
+          console.log('estadisticas',Stadistic)
     
           //setListaClientes(transactData)
           setValues(eventValues)
+          setStadistic(Stadistic)
           setEventId(eventoQuery.id)
         }
         if (values.eventoName) getInfo(values.eventoName)
