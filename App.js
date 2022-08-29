@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator();
 import Login from './screens/Login';
 import Home from './screens/Home';
 import UserDetailScreen from './screens/UserDetailScreen';
-import ReadQr from './screens/ReadQr';
+import ReadQr from './src/components/ReadQr';
 
 function MyStack() {
   return (

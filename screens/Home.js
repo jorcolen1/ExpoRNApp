@@ -10,11 +10,11 @@ import {
     orderBy,
     onSnapshot,
   } from 'firebase/firestore'
-import { View, Text, Button, TextInput, ScrollView, StyleSheet } from "react-native"
-import ModalDropdown from 'react-native-modal-dropdown';
-import {Picker} from '@react-native-picker/picker';
-import {AppStyles} from '../AppStyles'
-
+import { View, Text, Button, TextInput, StyleSheet } from "react-native"
+import { Picker } from '@react-native-picker/picker';
+import { AppStyles } from '../AppStyles'
+import ReadQr from '../src/components/ReadQr'
+import ReadQrC from '../src/components/ReadQrC'
 
 const CreateUserScreen = (props) => {
 
@@ -32,6 +32,7 @@ const CreateUserScreen = (props) => {
       const [stadistic, setStadistic] = useState([])
 
       const [eventId, setEventId] = useState('')
+      const [data, setData] = useState('')
       useEffect(() => {
         const traerEventos = async () => {
           let eventosArr = []
@@ -115,6 +116,7 @@ const CreateUserScreen = (props) => {
         if (values.eventoName) getInfo(values.eventoName)
       }, [values])
     
+      
     const handleChange = ( name, value) => {
         //console.log(name, value)
         setValues({ ...values, [name]: value })
@@ -143,14 +145,15 @@ const CreateUserScreen = (props) => {
         
       }
     const LecturaQR = async() => {
+      try {
 
-        try {
-                props.navigation.navigate('ReadQr')
-        } catch (error) {
-            
-        }
-        
+        <ReadQr newUserId={eventId}/>
+        props.navigation.navigate('ReadQr')
+      } catch (error) {
+          
       }
+        
+    }
   const parseDate = (unixDate) => {
     if (unixDate === undefined || isNaN(unixDate)) {
       return ''
@@ -223,12 +226,13 @@ const CreateUserScreen = (props) => {
             <Button
                 title="leer QR"
                 style={styles.loginText} 
-                onPress= {() => LecturaQR() }/>
-        </View>
-        
-        
+                onPress= {() => {
+                  //console.log('presssss')
+                  props.navigation.navigate('ReadQr')
 
-        
+                } }/>
+        </View>
+           
        {/*  <View>
             <Button 
                 title="Guardar user" 
