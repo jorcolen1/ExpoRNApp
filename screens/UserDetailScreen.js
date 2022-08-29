@@ -115,8 +115,6 @@ const styles = StyleSheet.create({
     borderRadius: AppStyles.borderRadius.main,
     padding: 10,
     marginTop: 30,
-    
-
   },
   button: {
     borderRadius: 20,
