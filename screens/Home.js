@@ -15,6 +15,9 @@ import { Picker } from '@react-native-picker/picker';
 import { AppStyles } from '../AppStyles'
 import ReadQr from '../src/components/ReadQr'
 import ReadQrC from '../src/components/ReadQrC'
+import { BarCodeScanner } from 'expo-barcode-scanner';
+
+
 
 const CreateUserScreen = (props) => {
 
@@ -33,6 +36,8 @@ const CreateUserScreen = (props) => {
 
       const [eventId, setEventId] = useState('')
       const [data, setData] = useState('')
+      const [hasPermission, setHasPermission] = useState(null);
+      const [scanned, setScanned] = useState(false);
       useEffect(() => {
         const traerEventos = async () => {
           let eventosArr = []
@@ -115,7 +120,26 @@ const CreateUserScreen = (props) => {
         }
         if (values.eventoName) getInfo(values.eventoName)
       }, [values])
+      useEffect(() => {
+        const getBarCodeScannerPermissions = async () => {
+          const { status } = await BarCodeScanner.requestPermissionsAsync();
+          setHasPermission(status === 'granted');
+        };
+        
+        getBarCodeScannerPermissions();
+      }, []);
     
+      const handleBarCodeScanned = ({ type, data }) => {
+        setScanned(true);
+        alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+      };
+    
+      if (hasPermission === null) {
+        return <Text>Requesting for camera permission</Text>;
+      }
+      if (hasPermission === false) {
+        return <Text>No access to camera</Text>;
+      }
       
     const handleChange = ( name, value) => {
         //console.log(name, value)
@@ -232,17 +256,14 @@ const CreateUserScreen = (props) => {
 
                 } }/>
         </View>
-           
-       {/*  <View>
-            <Button 
-                title="Guardar user" 
-                onPress= {() => saveNewUser() }/>
+        <View style={styles.container1}>
+          <BarCodeScanner
+            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+            style={StyleSheet.absoluteFillObject}
+          />
+          {scanned && <Button title={'Volver a escanear'} onPress={() => setScanned(false)} />}
         </View>
-        <View>
-            <Button
-                title="leer QR" 
-                onPress= {() => LecturaQR() }/>
-        </View> */}
+       
     </View>
   )
 }
@@ -251,6 +272,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+  },
+  container1: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   or: {
     color: 'black',
