@@ -95,7 +95,6 @@ const styles = StyleSheet.create({
     padding: 180,
     alignItems: 'center',
     shadowColor: '#000',
-    
     shadowOffset: {
       width: 0,
       
