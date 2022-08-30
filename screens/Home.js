@@ -16,6 +16,7 @@ import { AppStyles } from '../AppStyles'
 import ReadQr from '../src/components/ReadQr'
 import ReadQrC from '../src/components/ReadQrC'
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { async } from "@firebase/util";
 
 
 const CreateUserScreen = (props) => {
@@ -49,7 +50,7 @@ const CreateUserScreen = (props) => {
         const task = doc.data()
         task.id = doc.id
         eventosArr.push(task)
-      console.log('dataa: ', doc.data())
+      //console.log('dataa: ', doc.data())
 
       })
       /* const unsub = onSnapshot(doc(db, 'UsersAll', uidCurrent), (doc) => {
@@ -58,7 +59,7 @@ const CreateUserScreen = (props) => {
         console.log('Complete: ', eventosArr)
         setListaEventos(eventosArr.sort((a, b) => a.name > b.name))
       }) */
-      console.log('Complete: ', eventosArr)
+      //console.log('Complete: ', eventosArr)
       setListaEventos(eventosArr.sort((a, b) => a.name > b.name))
     }
     traerEventos()
@@ -78,7 +79,7 @@ const CreateUserScreen = (props) => {
       const Entradas = await getDocs(RefDB)
       Entradas.forEach((doc) => transactArrBase.push(doc.data()))
       
-      console.log('values Entradas-->>', transactArrBase)
+      //console.log('values Entradas-->>', transactArrBase)
       
       let Stadistic =[0, 0, 0, 0, 0 ]
       transactArrBase.forEach((doc) => {
@@ -102,7 +103,7 @@ const CreateUserScreen = (props) => {
             console.log('default');
         }
       })
-      console.log('estadisticas',Stadistic)
+      //console.log('estadisticas',Stadistic)
       eventValues.estTotal=transactArrBase.length
       eventValues.estLibre= Stadistic[0]
       eventValues.estReservado=Stadistic[1]
@@ -110,7 +111,7 @@ const CreateUserScreen = (props) => {
       eventValues.estVendido=Stadistic[3]
       eventValues.estValidado=Stadistic[4]
       //setListaClientes(transactData)
-      console.log('values estadisticasNames-->>', eventValues)
+      //console.log('values estadisticasNames-->>', eventValues)
 
       setValues(eventValues)
       setStadistic(Stadistic)
@@ -176,8 +177,33 @@ const CreateUserScreen = (props) => {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+    alert(`Bar code with type ${type} and data ${data} has been scanned---evento>>>${eventId}`);
+    controlTicket( type, data )
   };
+  const controlTicket = async (type, data) => {
+    console.log(type, data, eventId)
+    const citiesRef = collection(db, "Eventos", eventId, "Entradas");
+    const q = query(citiesRef, where("uuid", "==", data));
+
+    if (type === 256){
+      try {
+        const querySnapshot = await getDocs(q);
+        console.log('Respuesta de ',querySnapshot)
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id, " => ", doc.data());
+
+
+        });
+    } catch (error) {
+        
+    }
+  }else
+  {
+    alert('No es codigo valido ')
+  }
+    
+  };
+
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
   }
@@ -236,7 +262,7 @@ const CreateUserScreen = (props) => {
         <View style={styles.InputContainer}>
             <TextInput 
                 style={styles.body}
-                placeholder=""
+                placeholder="Estadisticas"
                 value={`${values.estTotal},${values.estLibre},${values.estReservado},${values.estPendiente},${values.estVendido},${values.estValidado}`}
                 placeholderTextColor={AppStyles.color.grey}
                 underlineColorAndroid="transparent"
@@ -301,9 +327,14 @@ const CreateUserScreen = (props) => {
                 
             </View>
           </Modal>
-          <Pressable style={[styles.button, styles.buttonOpen]} onPress={() => setModalVisible(true)}>
-            <Text style={styles.textStyle}>Validar</Text>
-          </Pressable>
+            {
+              eventId !== "" ? 
+                <Pressable style={[styles.button, styles.buttonOpen]} onPress={() => setModalVisible(true)}>
+                  <Text style={styles.textStyle}>Validar</Text>
+                </Pressable>
+              :"" 
+            }
+          
         </View>
        
        
