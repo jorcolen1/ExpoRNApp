@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { db } from '../database/firebase'
+import { getAuth } from 'firebase/auth'
 import {
     collection,
     doc,
@@ -9,14 +10,14 @@ import {
     where,
     orderBy,
     onSnapshot,
+    updateDoc,
+    addDoc
   } from 'firebase/firestore'
 import { View, Text, Button, TextInput, StyleSheet, Modal, Pressable, Alert } from "react-native"
 import { Picker } from '@react-native-picker/picker';
 import { AppStyles } from '../AppStyles'
 import ReadQr from '../src/components/ReadQr'
-import ReadQrC from '../src/components/ReadQrC'
 import { BarCodeScanner } from 'expo-barcode-scanner';
-import { async } from "@firebase/util";
 
 
 const CreateUserScreen = (props) => {
@@ -37,6 +38,8 @@ const CreateUserScreen = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const authAllData = getAuth()
+  const uidCurrent = authAllData.currentUser.uid
   useEffect(() => {
     const traerEventos = async () => {
       let eventosArr = []
@@ -177,32 +180,118 @@ const CreateUserScreen = (props) => {
 
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned---evento>>>${eventId}`);
-    controlTicket( type, data )
+    //alert(`Bar code with type ${type} and data ${data} has been scanned---evento>>>${eventId}`);
+    controlTicket(type, data)
   };
   const controlTicket = async (type, data) => {
-    console.log(type, data, eventId)
-    const citiesRef = collection(db, "Eventos", eventId, "Entradas");
-    const q = query(citiesRef, where("uuid", "==", data));
-
+    //console.log(type, data, eventId)
+    
     if (type === 256){
       try {
-        const querySnapshot = await getDocs(q);
-        console.log('Respuesta de ',querySnapshot)
-        querySnapshot.forEach((doc) => {
-          console.log(doc.id, " => ", doc.data());
-
-
-        });
-    } catch (error) {
+        const citiesRef = collection(db, "Eventos", eventId, "Entradas");
+        const q = query(citiesRef, where("uuid", "==", data));
+        const querySnapshot = await getDocs(q)
+        querySnapshot.docs.length === 0
+          ? alert(`El ticket no esta en este evento`)
+          : validarTicket(querySnapshot)
         
+    } catch (error) {
+      alert('error al obtener las entradas peticion', error)
     }
   }else
   {
     alert('No es codigo valido ')
   }
     
-  };
+  }
+  const validarTicket = async (querySnapshot) => {
+    querySnapshot.forEach((doc) => {
+      //console.log(doc.id, " => ", doc.data())
+      const dataTicket= doc.data()
+      const stateCurrente= dataTicket.estado
+      if(stateCurrente=== 'Vendido'){
+        toValidado(doc.id)
+        tovalidationInTransaction(doc.id)
+        alert('Ticket Validado')
+      }else{
+        alert(`El ticket esta: ${dataTicket.estado}`)
+      }
+    });
+  }
+  const toValidado = async (idTicket) => {
+    const entradaRef = doc(db, 'Eventos', eventId, 'Entradas', idTicket)
+    await updateDoc(entradaRef, {
+      estado: "Validado"
+    });
+    console.log("Escrito en Entradas ok")
+
+    let dataUnix = Math.round((new Date()).getTime() / 1000)
+    const docRef = await addDoc(collection(db, 'Eventos', eventId, 'Entradas', idTicket,'Logs'), {
+      dateUnix:dataUnix,
+      type:'Validado',
+      uidSourse:uidCurrent,
+      placeIPBuy:'direccionIP',
+      executorFunction: 'appAndroid'
+    });
+    console.log("Entradas log ok", docRef.id);
+  }
+
+  const tovalidationInTransaction = async (dbid) => {
+    
+    const TransaccionesAll = query(
+      collection(db, 'Eventos', eventId, 'Transactions'),
+      orderBy('dateTransaction', 'asc'),
+    )
+    const snapshot = await getDocs(TransaccionesAll)
+    snapshot.forEach((doc) => {
+      //console.log(doc.id, " => ", doc.data())
+      const transac = doc.data()
+      transac.id = doc.id
+      console.log("Antesssss", doc.id, " => ", transac.carrito)
+      
+      let encontrado = false
+      /* const updatedCarrito = transac.carrito.map(entrada =>
+        entrada.dbid === dbid
+          ? { ...entrada, estado:'Validada'}
+          : entrada,
+      ); */
+      var total= {}
+      let carritoArr = []
+      transac.carrito.forEach((entrada) => {
+        if (entrada.dbid === dbid){
+          total= {...entrada, estado:'Validada'}
+          //console.log("cambiado--->> ",total)
+          carritoArr.push(total)
+          encontrado = true
+        } else{
+          carritoArr.push(entrada)
+        }
+      });
+      //console.log("Encontrado ", "=>", encontrado)
+      console.log("despues--->> ", carritoArr)
+      encontrado
+      ? toValidado1( doc.id, carritoArr )
+      : ""
+    })
+
+  }
+  const toValidado1 = async (idTransaccion,updatedCarrito) => {
+    const entradaRef = doc(db, 'Eventos', eventId, 'Transactions', idTransaccion)
+    await updateDoc(entradaRef, {
+      carrito: updatedCarrito
+    });
+    console.log("Escrito en Transactions ok")
+
+    let dataUnix = Math.round((new Date()).getTime() / 1000)
+    const docRef = await addDoc(collection(db, 'Eventos', eventId, 'Transactions', idTransaccion,'Logs'), {
+      dateUnix:dataUnix,
+      type:'Validada',
+      uidSourse:uidCurrent,
+      placeIPBuy:'direccionIP',
+      executorFunction: 'appAndroid'
+    });
+    console.log("Transactions log ok", docRef.id);
+  }
 
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
