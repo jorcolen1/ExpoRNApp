@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react"
-import {View, Text, Button, ScrollView, TextInput, StyleSheet} from 'react-native'
+import {Image, View, Text, Button, ScrollView, TextInput, StyleSheet, ActivityIndicator, Pressable } from 'react-native'
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../database/firebase'
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { useFonts } from 'expo-font';
+
+
 import {AppStyles} from '../AppStyles'
 
 const Login = (props) => {
-
+  const [fontsLoaded] = useFonts({
+    'Inter-Black': require('../assets/fonts/Inter-Black.otf'),
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState()
@@ -41,35 +45,38 @@ const Login = (props) => {
   }
   return (
     <View style={styles.container}>
-      <Text style={[styles.title, styles.leftTitle]}>Iniciar Sesión</Text>
-        <View style={styles.InputContainer}>
-            <TextInput 
-                 style={styles.body}
-                 placeholder="E-mail"
-                 value={state.email}
-                 placeholderTextColor={AppStyles.color.grey}
-                 underlineColorAndroid="transparent"
-                onChangeText={(value) => handleChange('email', value)}            
-            />
-        </View>
-        <View style={styles.InputContainer}>
-            <TextInput 
+      <View style={styles.imagenContainer}>
+        <Image source = {require("../assets/logo.png")}
+        style={styles.image}
+        />
+      </View>
+      <Text style={[styles.title]}>Iniciar Sesión</Text>
+      <View style={styles.InputContainer}>
+          <TextInput 
                 style={styles.body}
-                secureTextEntry={true}
-                placeholder="Password"
-                value={state.password}
+                placeholder="E-mail"
+                value={state.email}
                 placeholderTextColor={AppStyles.color.grey}
                 underlineColorAndroid="transparent"
-                onChangeText={(value) => handleChange('password', value)}            
-            />
-        </View>
-        <View style={styles.loginContainer} >
-          <Button
-            title="Ingresar"
-            style={styles.loginText}
-            onPress={() => onPressLogin()}
-            />
-        </View>
+              onChangeText={(value) => handleChange('email', value)}            
+          />
+      </View>
+      <View style={styles.InputContainer}>
+          <TextInput 
+              style={styles.body}
+              secureTextEntry={true}
+              placeholder="Password"
+              value={state.password}
+              placeholderTextColor={AppStyles.color.grey}
+              underlineColorAndroid="transparent"
+              onChangeText={(value) => handleChange('password', value)}            
+          />
+      </View>
+      <View style={styles.loginContainer} >
+          <Pressable style={[styles.button, styles.buttonOpen]} onPress={() => onPressLogin()}>
+                <Text style={styles.textStyle}>Ingresar</Text>
+          </Pressable>
+      </View>
       <Text >{error}</Text>
 
         
@@ -81,19 +88,36 @@ const Login = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFF',
     alignItems: 'center',
+    justifyContent: 'center',
+    
   },
-  or: {
-    color: 'black',
-    marginTop: 40,
-    marginBottom: 10,
+  tipoLetra: {
+    fontFamily: 'Inter-Black'
+  },
+  imagenContainer: {
+    width: AppStyles.buttonWidth.main,
+    backgroundColor: AppStyles.color.blanck,
+    borderRadius: AppStyles.borderRadius.main,
+    padding: 15,
+    marginTop:10,
+    marginBottom:30,
+  },
+  image :{
+    width: 250,
+    height: 180,
+    borderWidth: 2,
+    borderColor: "#FFF",
+
   },
   title: {
     fontSize: AppStyles.fontSize.title,
-    fontWeight: 'bold',
-    color: AppStyles.color.tint,
+    //fontWeight: 'bold',
+    color: AppStyles.color.black,
     marginTop: 20,
     marginBottom: 20,
+    fontFamily: 'Inter-Black'
   },
   leftTitle: {
     alignSelf: 'stretch',
@@ -107,23 +131,20 @@ const styles = StyleSheet.create({
     fontSize: AppStyles.fontSize.content,
     color: AppStyles.color.text,
   },
+  
   loginContainer: {
     width: AppStyles.buttonWidth.main,
     backgroundColor: AppStyles.color.blank,
     borderRadius: AppStyles.borderRadius.main,
-    padding: 10,
-    marginTop: 30,
-  },
-  loginText: {
-    color: AppStyles.color.tint,
-  
+    marginTop: 40,
+    marginBottom: 60,
   },
   placeholder: {
     color: 'red',
   },
   InputContainer: {
     width: AppStyles.textInputWidth.main,
-    marginTop: 30,
+    marginTop: 20,
     borderWidth: 1,
     borderStyle: 'solid',
     borderColor: AppStyles.color.grey,
@@ -134,6 +155,29 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     color: AppStyles.color.text,
-  }
+  },
+  button: {
+    borderRadius: AppStyles.borderRadius.main,
+    borderWidth: 1,
+    borderColor: AppStyles.color.grey,
+    padding: 15,
+    elevation: 2,
+    marginTop: 5,
+  },
+  buttonOpen: {
+    backgroundColor: AppStyles.color.facebook,
+  },
+  buttonClose: {
+    borderRadius: 20,
+    padding: 20,
+    elevation: 2,
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    
+  },
 });
 export default Login

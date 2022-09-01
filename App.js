@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
+import { useFonts } from 'expo-font';
 
 import { View, Text, Button, TextInput, ScrollView } from "react-native"
 
@@ -13,11 +13,14 @@ import UserDetailScreen from './screens/UserDetailScreen';
 import ReadQr from './src/components/ReadQr';
 
 function MyStack() {
+  const [fontsLoaded] = useFonts({
+    'Inter-Black': require('./assets/fonts/Inter-Black.otf'),
+  });
   return (
     <Stack.Navigator>
-      <Stack.Screen name='IniciarSesión' component={Login}/>
-      <Stack.Screen name='Home' component={Home}/>
-      <Stack.Screen name='ReadQr' component={ReadQr}/>
+      <Stack.Screen name='IniciarSesión' component={Login} options={{ title: "" }}/>
+      <Stack.Screen name='Home' component={Home} options={{ title: "" }}/>
+      <Stack.Screen name='ReadQr' component={ReadQr} options={{ title: "" }}/>
       <Stack.Screen name='UserDetailScreen' component={UserDetailScreen}/>
     </Stack.Navigator>
   )

@@ -18,9 +18,12 @@ import { Picker } from '@react-native-picker/picker';
 import { AppStyles } from '../AppStyles'
 import ReadQr from '../src/components/ReadQr'
 import { BarCodeScanner } from 'expo-barcode-scanner';
-
+import { useFonts } from 'expo-font';
 
 const CreateUserScreen = (props) => {
+  const [fontsLoaded] = useFonts({
+    'Inter-Black': require('../assets/fonts/Inter-Black.otf'),
+  });
   const intialValues = {
         name: '',
         recintoName: '',
@@ -136,38 +139,8 @@ const CreateUserScreen = (props) => {
       //console.log(name, value)
       setValues({ ...values, [name]: value })
   }
-  const saveNewUser = async() => {
-      console.log(state)
-      if (state.name === ''){
-          alert('ingrese el nombre')
-      }else
-      {
-          try {
-              const docRef = await addDoc(collection(db, "Users"), {
-                  name: state.name,
-                  phone: state.phone,
-                  email: state.email,
-                  password: state.password
-                });
-                console.log("Document written with ID: ", docRef.id);
-                alert('Guardado')
-                //props.navigation.navigate('IniciarSesión')
-          } catch (error) {
-              
-          }
-      }
-      
-  }
-  const LecturaQR = async() => {
-    try {
+  
 
-      <ReadQr newUserId={eventId}/>
-      props.navigation.navigate('ReadQr')
-    } catch (error) {
-        
-    }
-      
-  }
   const parseDate = (unixDate) => {
     if (unixDate === undefined || isNaN(unixDate)) {
       return ''
@@ -359,7 +332,7 @@ const CreateUserScreen = (props) => {
                 //onChangeText={(value) => handleChange('email', value)}            
             />
         </View>
-        {/* <View style={styles.loginContainer}>
+        {/* <View style={styles.centeredView}>
             <Button
                 title="leer QR"
                 style={styles.loginText} 
@@ -377,7 +350,7 @@ const CreateUserScreen = (props) => {
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert('Modal has been closed');
+              //Alert.alert('Salir Lector QR');
               setModalVisible(!modalVisible);
               setScanned(true);
             }}>
@@ -438,6 +411,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    fontFamily: 'Inter-Black'
   },
   or: {
     color: 'black',
