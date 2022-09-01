@@ -365,9 +365,12 @@ const CreateUserScreen = (props) => {
                 style={styles.loginText} 
                 onPress= {() => {
                   //console.log('presssss')
-                  props.navigation.navigate('ReadQr')
+                  props.navigation.navigate('ReadQr', {
+                    eventId: eventId,
+                  })
+                  
                 } }/>
-        </View> */}
+        </View>  */}
         <View style={styles.centeredView}>
           <Modal
             animationType="fade"

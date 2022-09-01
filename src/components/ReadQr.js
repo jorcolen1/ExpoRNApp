@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
-const ReadQr = ({ newUserId }) => {
+const ReadQr = (props) => {
+  console.log(props.route.params.eventId)
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   
   useEffect(() => {
-    console.log('DENTRO DE QR->>>>',newUserId)
+    console.log('DENTRO DE QR->>>>',props.route.params.eventId)
   }, [])
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
